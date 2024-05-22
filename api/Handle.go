@@ -126,7 +126,7 @@ func Handle(w http.ResponseWriter, r *http.Request) {
 	commandRes := DiscordResponse{
 		Type: ChannelMessageWithSource,
 		Data: DiscordResponseData{
-			Content: fmt.Sprintf("Your current streak is %d that's %f years, last reward was <t:%d:D>", resp.RewardStreak, float32(resp.RewardStreak)/365.0, resp.LastRewardTimestamp),
+			Content: fmt.Sprintf("Reg's current streak is %d that's %f years, last reward was <t:%d:D>", resp.RewardStreak, float32(resp.RewardStreak)/365.0, resp.LastRewardTimestamp),
 		},
 	}
 
