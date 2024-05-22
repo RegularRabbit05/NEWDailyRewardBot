@@ -9,7 +9,7 @@ import (
 )
 
 func Init(w http.ResponseWriter, r *http.Request) {
-	discordClientID := os.Getenv("discord-client-id")
+	discordClientID := os.Getenv("discord_client_id")
 	if len(discordClientID) == 0 {
 		w.WriteHeader(http.StatusInternalServerError)
 		return

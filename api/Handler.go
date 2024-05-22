@@ -143,7 +143,7 @@ type ResponseAPI struct {
 }
 
 func checkDailyReward() ResponseAPI {
-	res, err := http.Get(os.Getenv("api-url"))
+	res, err := http.Get(os.Getenv("api_url"))
 	if err != nil {
 		return ResponseAPI{Result: false}
 	}
@@ -158,7 +158,7 @@ func checkDailyReward() ResponseAPI {
 }
 
 func verify(w http.ResponseWriter, r *http.Request, body []byte) {
-	publicKey := os.Getenv("discord-public-key")
+	publicKey := os.Getenv("discord_public_key")
 
 	signature := r.Header.Get("X-Signature-Ed25519")
 	timestamp := r.Header.Get("X-Signature-Timestamp")
