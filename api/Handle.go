@@ -110,8 +110,8 @@ func Handle(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	resp := checkDailyReward()
-	if !resp.Result {
+	resp, err := checkDailyReward()
+	if err != nil {
 		commandRes := DiscordResponse{
 			Type: ChannelMessageWithSource,
 			Data: DiscordResponseData{
@@ -142,19 +142,19 @@ type ResponseAPI struct {
 	Result              bool   `json:"result"`
 }
 
-func checkDailyReward() ResponseAPI {
+func checkDailyReward() (ResponseAPI, error) {
 	res, err := http.Get(os.Getenv("api_url"))
 	if err != nil {
-		return ResponseAPI{Result: false}
+		return ResponseAPI{Result: false}, err
 	}
 	defer res.Body.Close()
 
 	var apiResponse ResponseAPI
 	if err = json.NewDecoder(res.Body).Decode(&apiResponse); err != nil {
-		return ResponseAPI{Result: false}
+		return ResponseAPI{Result: false}, err
 	}
 
-	return apiResponse
+	return apiResponse, nil
 }
 
 func verify(w http.ResponseWriter, r *http.Request, body []byte) {
