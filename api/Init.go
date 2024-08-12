@@ -20,7 +20,7 @@ func Init(w http.ResponseWriter, r *http.Request) {
 
 	botToken := os.Getenv("discord-bot-token")
 
-	commandOptions := `{"name": "streak", "description": "Polls Reg's daily reward streak'", "options": []}`
+	commandOptions := `{"name": "streak", "description": "Polls Reg's daily reward streak'", "options": [], "integration_types": [0, 1], "contexts": [0, 1, 2]}`
 
 	req, err := http.NewRequest(http.MethodPost, registerCommand, strings.NewReader(commandOptions))
 	if err != nil {
