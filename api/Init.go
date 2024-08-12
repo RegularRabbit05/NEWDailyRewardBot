@@ -18,7 +18,7 @@ func Init(w http.ResponseWriter, r *http.Request) {
 	registerCommand := fmt.Sprintf("https://discord.com/api/v10/applications/%s/commands",
 		discordClientID)
 
-	botToken := os.Getenv("discord-bot-token")
+	botToken := os.Getenv("discord_bot_token")
 
 	commandOptions := `{"name": "streak", "description": "Polls Reg's daily reward streak'", "options": [], "integration_types": [0, 1], "contexts": [0, 1, 2]}`
 
