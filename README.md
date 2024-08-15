@@ -5,3 +5,5 @@ If you want to use this yourself import this into vercel and then setup the foll
 - discord_bot_token: token from the bot page
 - discord_client_id: app id
 - discord_public_key: public key from the app page (remember to enable both user and guild installs!)
+
+set env "allow_init" to "true", call https://link/api/Init to register the commands and then delete "allow_init"
