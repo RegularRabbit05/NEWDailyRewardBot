@@ -9,6 +9,11 @@ import (
 )
 
 func Init(w http.ResponseWriter, r *http.Request) {
+	if os.Getenv("allow_init") != "true" {
+		log.Println("Init refused")
+		return
+	}
+	
 	discordClientID := os.Getenv("discord_client_id")
 	if len(discordClientID) == 0 {
 		w.WriteHeader(http.StatusInternalServerError)
@@ -20,7 +25,7 @@ func Init(w http.ResponseWriter, r *http.Request) {
 
 	botToken := os.Getenv("discord_bot_token")
 
-	commandOptions := `{"name": "streak", "description": "Polls Reg's daily reward streak'", "options": [], "integration_types": [0, 1], "contexts": [0, 1, 2]}`
+	commandOptions := `{"name": "streak", "description": "Polls Reg's daily reward streak", "options": [], "integration_types": [0, 1], "contexts": [0, 1, 2]}`
 
 	req, err := http.NewRequest(http.MethodPost, registerCommand, strings.NewReader(commandOptions))
 	if err != nil {
