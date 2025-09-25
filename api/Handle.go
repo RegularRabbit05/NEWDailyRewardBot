@@ -17,6 +17,7 @@ type DiscordInteraction struct {
 	Type   float64                  `json:"type"`
 	Data   DiscordInteractionData   `json:"data"`
 	Member DiscordInteractionMember `json:"member"`
+	Token  string                   `json:"token"`
 }
 
 // DiscordInteractionData is present for the slash command itself
@@ -77,6 +78,37 @@ func writeResponse(w http.ResponseWriter, commandRes DiscordResponse) {
 	w.Write(data)
 }
 
+func writeUpdate(token string) {
+	url := fmt.Sprintf("https://discord.com/api/webhooks/%s/%s/messages/@original", os.Getenv("discord_client_id"), token)
+
+	resp, err := checkDailyReward()
+	var commandRes DiscordResponseData
+	if err != nil {
+		commandRes = DiscordResponseData{
+			Content: "Unable to fetch data from the API try again later :(",
+		}
+	} else {
+		rankString := "unknown"
+		if resp.Rank >= 0 {
+			rankString = fmt.Sprint(resp.Rank)
+		}
+		commandRes = DiscordResponseData{
+			Content: fmt.Sprintf("Reg's current streak is %d (approximate rank: %s) that's %f years, last reward was <t:%d:D>", resp.RewardStreak, rankString, float32(resp.RewardStreak)/365.0, resp.LastRewardTimestamp),
+		}
+	}
+
+	fmt.Println(commandRes)
+	data, _ := json.Marshal(commandRes)
+	client := &http.Client{}
+	req, err := http.NewRequest("PATCH", url, bytes.NewBuffer(data))
+	req.Header.Set("Content-Type", "application/json")
+	if err != nil {
+		return
+	}
+	r, _ := client.Do(req)
+	defer r.Body.Close()
+}
+
 func Handle(w http.ResponseWriter, r *http.Request) {
 	var body []byte
 	if r.Body != nil {
@@ -99,6 +131,7 @@ func Handle(w http.ResponseWriter, r *http.Request) {
 	msg := DiscordInteraction{}
 
 	if err := json.Unmarshal(body, &msg); err != nil {
+		fmt.Println(err.Error())
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
@@ -110,26 +143,14 @@ func Handle(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	resp, err := checkDailyReward()
-	if err != nil {
-		commandRes := DiscordResponse{
-			Type: ChannelMessageWithSource,
-			Data: DiscordResponseData{
-				Content: "Unable to fetch data from the API try again later :(",
-			},
-		}
-
-		writeResponse(w, commandRes)
-		return
-	}
-
 	commandRes := DiscordResponse{
 		Type: ChannelMessageWithSource,
 		Data: DiscordResponseData{
-			Content: fmt.Sprintf("Reg's current streak is %d that's %f years, last reward was <t:%d:D>", resp.RewardStreak, float32(resp.RewardStreak)/365.0, resp.LastRewardTimestamp),
+			Content: "Please wait while we load the data...",
 		},
 	}
 
+	go writeUpdate(msg.Token)
 	writeResponse(w, commandRes)
 }
 
@@ -140,6 +161,7 @@ type ResponseAPI struct {
 	CurrentDate         string `json:"currentDate"`
 	RewardStreak        int    `json:"rewardStreak"`
 	Result              bool   `json:"result"`
+	Rank                int    `json:"rewardLeaderboard"`
 }
 
 func checkDailyReward() (ResponseAPI, error) {
