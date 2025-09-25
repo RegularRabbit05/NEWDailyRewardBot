@@ -97,7 +97,6 @@ func writeUpdate(token string) {
 		}
 	}
 
-	fmt.Println(commandRes)
 	data, _ := json.Marshal(commandRes)
 	client := &http.Client{}
 	req, err := http.NewRequest("PATCH", url, bytes.NewBuffer(data))
